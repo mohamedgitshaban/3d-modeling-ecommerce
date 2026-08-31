@@ -4,6 +4,35 @@ A full-featured e-commerce platform for home fixtures & fittings (bathroom fauce
 
 The platform goes beyond a standard catalog by letting every product be viewed as an **interactive 3D model** (with mobile AR support), by letting merchandisers build **cross-category collections** sold as a single purchasable product, and by giving every category its **own dynamic spec/description schema** — exactly like the Remer faucet example on nameeks.com (Overview, bullet features, "More Features" key/value grid, Certifications, Info & Guides PDFs, Specifications table, breadcrumbs, SKU/MSRP).
 
+> **Status:** this repository is a working implementation of the design below — migrations, models, services, storefront, admin dashboard, Paymob integration, and post-payment order tracking are all built and seeded with a working demo catalog (the Remer faucet example, a variant-driven Vanity, and a cross-category Collection). Run the [Quick Start](#quick-start) to see it live.
+
+---
+
+## Quick Start
+
+```bash
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+
+# SQLite is the zero-config default (database/database.sqlite is created automatically
+# by the migrate command below). To use MySQL instead, set DB_CONNECTION=mysql and the
+# related DB_* vars in .env first.
+touch database/database.sqlite
+php artisan migrate --seed   # seeds the Remer faucet, a variant-driven Vanity, a Collection, coupons, offers, shipping & stores
+
+npm run build                # or `npm run dev` while developing
+php artisan serve
+```
+
+Then visit:
+- **Storefront:** `http://localhost:8000` — browse `Bathroom Fixtures → Bathroom Faucets` for the Remer faucet PDP (dynamic spec sections, variant picker), or `→ Bathroom Vanities` for the Handle Finish × Vanity Finish × Size variant matrix, or `/collections/modena-matte-black-bath-suite` for the cross-category bundle.
+- **Admin dashboard:** `http://localhost:8000/admin` — log in with `admin@example.com` / `password` (seeded by `DemoSeeder`) to manage categories/schema, products, 3D models, variants, stock, coupons, offers, and orders.
+- **Order tracking:** `/track-order` — look up any order by number + email; the timeline updates live (via Reverb) or by polling if Reverb isn't running.
+
+Real-time features (`php artisan reverb:start`) and the queue worker (`php artisan queue:work`) are optional for browsing the catalog, but required for live stock badges and live order-status updates — see [Installation & Setup](#installation--setup) for the full local dev stack. Paymob checkout requires real `PAYMOB_*` credentials in `.env`; without them, `/checkout` will fail at the payment step (everything up to and including order/stock creation still works).
+
 ---
 
 ## Table of Contents
